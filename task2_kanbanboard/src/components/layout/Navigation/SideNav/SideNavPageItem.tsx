@@ -8,7 +8,7 @@ type SideNavItemProps = {
 
 const SideNavItem = (props: SideNavItemProps) => {
   return(
-    <div className="flex gap-[14px] items-center px-[12px] py-[14px]">
+    <div className="flex gap-[14px] items-center  py-[14px]">
       {props.icon}
       <p className="text-[16px] text-[#787486]">{props.name}</p>
     </div>

@@ -5,9 +5,9 @@ interface HeaderProps {
   projectName: string;
 }
 
-const Header = ({ projectName }: HeaderProps) => {
+const NavHeader = ({ projectName }: HeaderProps) => {
   return (
-    <a href="/projects" className="flex items-center gap-[46px]">
+    <a href="/projects" className="flex items-center justify-between w-full">
       <div className="flex items-center gap-[9px]">
         <BiCake width={24} height={24} />
         <p className="text-[20px] font-semibold text-nowrap">{projectName}</p>
@@ -20,4 +20,4 @@ const Header = ({ projectName }: HeaderProps) => {
   );
 };
 
-export default Header;
+export default NavHeader;

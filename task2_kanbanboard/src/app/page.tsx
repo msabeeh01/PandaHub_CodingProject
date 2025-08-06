@@ -2,7 +2,7 @@ import Navigation from "@/components/layout/Navigation/Navigation";
 
 export default function Home() {
   return (
-    <div className="font-sans justify-items-center min-h-screen">
+    <div className="font-sans min-h-screen">
       <Navigation />
       {/* <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Image

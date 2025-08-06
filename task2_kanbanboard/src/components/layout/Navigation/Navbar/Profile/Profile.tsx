@@ -45,7 +45,7 @@ const Profile = ({
         aria-controls={id}
         className="flex items-center gap-4 focus:outline-none focus:ring-2 focus:ring-brand"
       >
-        <div className="flex flex-col gap-0 text-right">
+        <div className="hidden lg:flex flex-col gap-0 text-right">
           <p className="text-[16px]">{userName}</p>
           <p className="text-[14px] text-[#787486]">{location}</p>
         </div>

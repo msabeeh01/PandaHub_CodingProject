@@ -9,7 +9,7 @@ const SearchBar = () => {
     <form
       action=""
       role="search"
-      className="bg-[#F5F5F5] rounded-sm h-[44px] w-[417px] pl-4 gap-2 items-center flex"
+      className="bg-[#F5F5F5] rounded-sm h-[44px] max-w-[417px] pl-4 gap-2 items-center flex"
     >
       <BiSearch width={22} height={22} />
       <input

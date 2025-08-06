@@ -8,7 +8,7 @@ type SideNavProjectItemProps = {
 
 const SideNavProjectItem = (props: SideNavProjectItemProps) => {
   return(
-    <a href="/" className="flex hover:bg-[rgb(80_48_229_/_8%)] gap-[14px] items-center px-[12px] py-[14px] rounded-[5px]">
+    <a href="/" className="flex hover:bg-[rgb(80_48_229_/_8%)] gap-[14px] items-center py-[12px] px-[12px] rounded-[5px]">
       {props.icon}
       <p className="text-[16px] font-semibold">{props.name}</p>
     </a>
