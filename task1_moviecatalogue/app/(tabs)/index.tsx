@@ -10,9 +10,10 @@ import { theme } from "@/utils/theme";
 import SearchBar from "@/components/ui/SearchBar";
 import Subheader from "@/components/ui/Subheader";
 import MovieCarousel from "@/components/MovieCarousel";
-import { Movie } from "@/types/movie";
+import { Movie } from "@/types/domain";
 import { useMovies } from "@/hooks/useMovies";
 import ComingSoon from "@/components/ComingSoon";
+import PlaceholderCarousel from "@/components/MovieCarousel/PlaceholderCarousel";
 
 export default function HomeScreen() {
   const { movies, loading, error } = useMovies();
@@ -22,15 +23,22 @@ export default function HomeScreen() {
         <ThemedView style={styles.pagePadded}>
           <Greeting />
           <SearchBar />
-          <Subheader subheading="Upcoming Movies" redirect="See all" />
+          <Subheader subheading="Now Playing" redirect="See all" />
         </ThemedView>
 
         {loading && <ThemedText>Loading movies...</ThemedText>}
         {error && <ThemedText>Failed to load movies</ThemedText>}
 
         {/* Carousel */}
-        {/* only show the carousel if there are movies */}
-        {movies.length > 0 && <MovieCarousel movies={movies} />}
+        {/* only show the carousel if there are movies, otherwise show CarouselPlaceholder */}
+        {movies.length > 0 && (
+          <MovieCarousel movies={movies} />
+        )}
+
+        {/* if there are no movies, show placeholdercarousel  */}
+        {movies.length === 0 && (
+          <PlaceholderCarousel />
+        )}
 
         <ThemedView style={styles.pagePadded}>
           <Subheader subheading="Coming Soon" redirect="See all" />

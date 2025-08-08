@@ -6,7 +6,7 @@ import { theme } from "@/utils/theme";
 import { StyleSheet } from "react-native";
 import Director from "./Director";
 import Subheader from "@/components/ui/Subheader";
-import { CastMember, CrewMember } from "@/types/movie";
+import { CastMember, CrewMember } from "@/types/domain";
 import { useEffect } from "react";
 import useMovieStore from "@/store/movieStore";
 
@@ -17,7 +17,7 @@ type MovieDetailHeaderProps = {
 const MovieDetailHeader = (
   {crew}: MovieDetailHeaderProps
 ) => {
-  const {movie} = useMovieStore();
+  const {selectedMovie} = useMovieStore();
   //find director should only work if crew is available
   const findDirector = (crew: CrewMember[]) => {
     return crew.find((member) => member.job === "Director");
@@ -26,8 +26,8 @@ const MovieDetailHeader = (
     const director = crew && Array.isArray(crew) ? findDirector(crew) : undefined;
   return (
     <ThemedView style={styles.container}>
-      <MovieTitle movieTitle={movie?.title || "Loading"} />
-      <MovieSubtitle text={movie?.overview || "Loading"} />
+      <MovieTitle movieTitle={selectedMovie?.title || "Loading"} />
+      <MovieSubtitle releaseDate={selectedMovie?.release_date || "Loading"} genres={selectedMovie?.category || "Loading"} runtime={selectedMovie?.runtime || 0} />
       <Director director={director}/>
     </ThemedView>
   );

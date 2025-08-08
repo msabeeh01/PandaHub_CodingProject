@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   View,
-  Text,
-  Image,
   ScrollView,
   Dimensions,
   StyleSheet,
@@ -11,29 +9,28 @@ import {
   Platform,
   Animated,
 } from "react-native";
-import { Link, router } from "expo-router";
-import { Movie } from "@/types/domain";
 import { theme } from "@/utils/theme";
-import useMovieStore from "@/store/movieStore";
 
-interface MovieCarouselProps {
-  movies: Movie[];
-  onMoviePress?: (movie: Movie) => void;
+interface PlaceholderCarouselProps {
+  count?: number;
   showDots?: boolean;
-  autoPlay?: boolean;
 }
 
 const { width: screenWidth } = Dimensions.get("window");
 const CARD_WIDTH = screenWidth * 0.6;
 const CARD_MARGIN = 40;
 
-const MovieCarousel: React.FC<MovieCarouselProps> = ({
-  movies,
+const PlaceholderCarousel: React.FC<PlaceholderCarouselProps> = ({
+  count = 5,
   showDots = true,
-  autoPlay = false,
 }) => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const scrollViewRef = useRef<ScrollView>(null);
+
+  // Create placeholder data
+  const placeholderData = Array.from({ length: count }, (_, index) => ({
+    id: `placeholder-${index}`,
+  }));
 
   /**
    * Stores animated values for each card:
@@ -42,12 +39,41 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
    * - translateY: moves cards back to simulate depth
    */
   const animationValues = useRef(
-    movies.map(() => ({
+    placeholderData.map(() => ({
       rotation: new Animated.Value(0),
       scale: new Animated.Value(1),
       translateY: new Animated.Value(0),
     }))
   ).current;
+
+  /**
+   * Shimmer animation for placeholder cards
+   */
+  const shimmerAnimation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const shimmer = Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmerAnimation, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmerAnimation, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    shimmer.start();
+    return () => shimmer.stop();
+  }, [shimmerAnimation]);
+
+  const shimmerOpacity = shimmerAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.3, 0.7],
+  });
 
   /**
    * Runs when activeIndex changes.
@@ -101,7 +127,7 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
     const index = Math.round(scrollPosition / (CARD_WIDTH + CARD_MARGIN));
-    setActiveIndex(Math.max(0, Math.min(index, movies.length - 1)));
+    setActiveIndex(Math.max(0, Math.min(index, placeholderData.length - 1)));
   };
 
   /**
@@ -137,7 +163,7 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
 
     return (
       <View style={styles.dotsContainer}>
-        {movies.map((_, index) => (
+        {placeholderData.map((_, index) => (
           <View
             key={index}
             style={[
@@ -151,41 +177,36 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
   };
 
   /**
-   * Renders a single movie card with touch handling
-   * and animated tilt/scale/depth effects.
+   * Renders a single placeholder card with shimmer animation
    */
-  const renderMovieCard = (movie: Movie, index: number) => {
-    const { setSelectedMovie } = useMovieStore();
+  const renderPlaceholderCard = (item: { id: string }, index: number) => {
     return (
-      <Link
-        onPress={() => setSelectedMovie(movie)}
-        key={movie.id}
-        style={styles.cardContainer}
-        href={{
-          pathname: "/movies/[id]",
-          params: { id: movie.id },
-        }}
-      >
+      <View key={item.id} style={styles.cardContainer}>
         <Animated.View style={getCardStyle(index)}>
-          <Image source={{ uri: movie.image }} style={styles.cardImage} />
+          <Animated.View 
+            style={[
+              styles.placeholderImage,
+              { opacity: shimmerOpacity }
+            ]} 
+          />
           <View style={styles.cardContent}>
-            <Text style={styles.movieTitle} numberOfLines={1}>
-              {movie.title}
-            </Text>
-            <Text style={styles.movieCategory}>{movie.category}</Text>
+            <Animated.View 
+              style={[
+                styles.placeholderTitle,
+                { opacity: shimmerOpacity }
+              ]} 
+            />
+            <Animated.View 
+              style={[
+                styles.placeholderCategory,
+                { opacity: shimmerOpacity }
+              ]} 
+            />
           </View>
         </Animated.View>
-      </Link>
-    );
-  };
-
-  if (!movies.length) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No movies available</Text>
       </View>
     );
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -211,7 +232,7 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
         onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        {movies.map((movie, index) => renderMovieCard(movie, index))}
+        {placeholderData.map((item, index) => renderPlaceholderCard(item, index))}
       </ScrollView>
 
       {renderDots()}
@@ -232,37 +253,9 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: "hidden",
   },
-  cardImage: {
-    width: "100%",
-    height: 320,
-    resizeMode: "cover",
-    borderRadius: 15,
-  },
   cardContent: {
     padding: 15,
     alignItems: "center",
-  },
-  movieTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: theme.colors.text,
-    marginBottom: 5,
-    textAlign: "center",
-  },
-  movieCategory: {
-    fontSize: 14,
-    color: theme.colors.muted,
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  ratingContainer: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  rating: {
-    fontSize: 12,
-    fontWeight: "bold",
   },
   dotsContainer: {
     flexDirection: "row",
@@ -283,16 +276,26 @@ const styles = StyleSheet.create({
   inactiveDot: {
     backgroundColor: theme.colors.muted,
   },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: 200,
+  // Placeholder-specific styles
+  placeholderImage: {
+    width: "100%",
+    height: 320,
+    backgroundColor: theme.colors.muted,
+    borderRadius: 15,
   },
-  emptyText: {
-    color: theme.colors.muted,
-    fontSize: 16,
+  placeholderTitle: {
+    width: "80%",
+    height: 20,
+    backgroundColor: theme.colors.muted,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  placeholderCategory: {
+    width: "60%",
+    height: 16,
+    backgroundColor: theme.colors.muted,
+    borderRadius: 4,
   },
 });
 
-export default MovieCarousel;
+export default PlaceholderCarousel;

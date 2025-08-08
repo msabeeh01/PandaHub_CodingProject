@@ -4,11 +4,15 @@ import { StyleSheet } from "react-native";
 import SynopsisText from "./SynopsisText";
 import { theme } from "@/utils/theme";
 
-const Synopsis = () => {
+type SynopsisProps = {
+  text: string;
+};
+
+const Synopsis = ({text}: SynopsisProps) => {
   return (
     <ThemedView style={styles.container}>
       <Subheader subheading="Synopsis" />
-      <SynopsisText text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. asdddddddddddddddddddddddd" />
+      <SynopsisText text={text} />
     </ThemedView>
   );
 };

@@ -1,12 +1,12 @@
+import { TMDBGenresResponse, TMDBMoviesResponse } from "@/types/api";
+
 import {
   CastMember,
   CrewMember,
   Movie,
   MovieCredits,
-  TMDBGenresResponse,
-  TMDBMovie,
-  TMDBMoviesResponse,
-} from "@/types/movie";
+  MovieDetails,
+} from "@/types/domain";
 
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
@@ -38,6 +38,20 @@ class MovieService {
       });
     } catch (error) {
       console.error("Failed to fetch genres:", error);
+    }
+  }
+
+  private async fetchDetails(movieId: number): Promise<number | null> {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/movie/${movieId}?language=en-US`,
+        options
+      );
+      const data: MovieDetails = await response.json();
+      return data.runtime;
+    } catch (error) {
+      console.error(`Failed to fetch details for movie ${movieId}:`, error);
+      return null;
     }
   }
 
@@ -96,22 +110,28 @@ class MovieService {
         }
       );
       const data: TMDBMoviesResponse = await response.json();
-      // once data is fetched, find the corresponding genre based on genre_ids for each movie fetched by popular movies
-      const movies: Movie[] = data.results.map((movie) => {
-        // Map genre_ids to genre names
-        const genreNames = movie.genre_ids
-          .map((id) => this.genreMap.get(id))
-          .filter((name) => name !== undefined);
 
-        return {
-          id: movie.id,
-          title: movie.title,
-          category: genreNames.join(", "),
-          image: `${IMAGE_BASE_URL}${movie.poster_path}`,
-          overview: movie.overview || "No overview available",
-          genre_ids: movie.genre_ids,
-        };
-      });
+      // Resolve all movies with runtime in parallel
+      const movies: Movie[] = await Promise.all(
+        data.results.map(async (movie) => {
+          const genreNames = movie.genre_ids
+            .map((id) => this.genreMap.get(id))
+            .filter((name): name is string => name !== undefined);
+
+          const runtime = await this.fetchDetails(movie.id);
+
+          return {
+            id: movie.id,
+            title: movie.title,
+            category: genreNames.join(", "),
+            image: `${IMAGE_BASE_URL}${movie.poster_path}`,
+            overview: movie.overview || "No overview available",
+            genre_ids: movie.genre_ids,
+            release_date: movie.release_date || "TBA",
+            runtime,
+          };
+        })
+      );
       return movies;
     } catch (error) {
       console.error("Failed to fetch movies:", error);
@@ -128,21 +148,27 @@ class MovieService {
         options
       );
       const data: TMDBMoviesResponse = await response.json();
-      const movies: Movie[] = data.results.map((movie) => {
-        // Map genre_ids to genre names
-        const genreNames = movie.genre_ids
-          .map((id) => this.genreMap.get(id))
-          .filter((name) => name !== undefined);
+      // Resolve all movies with runtime in parallel
+      const movies: Movie[] = await Promise.all(
+        data.results.map(async (movie) => {
+          const genreNames = movie.genre_ids
+            .map((id) => this.genreMap.get(id))
+            .filter((name): name is string => name !== undefined);
 
-        return {
-          id: movie.id,
-          title: movie.title,
-          category: genreNames.join(", "),
-          image: `${IMAGE_BASE_URL}${movie.poster_path}`,
-          overview: movie.overview || "No overview available",
-          genre_ids: movie.genre_ids,
-        };
-      });
+          const runtime = await this.fetchDetails(movie.id);
+
+          return {
+            id: movie.id,
+            title: movie.title,
+            category: genreNames.join(", "),
+            image: `${IMAGE_BASE_URL}${movie.poster_path}`,
+            overview: movie.overview || "No overview available",
+            genre_ids: movie.genre_ids,
+            runtime,
+            release_date: movie.release_date || "TBA",
+          };
+        })
+      );
       return movies;
     } catch (error) {
       console.error("Failed to fetch upcoming movies:", error);
