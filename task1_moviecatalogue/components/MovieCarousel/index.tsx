@@ -6,15 +6,15 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
-  TouchableOpacity,
   NativeSyntheticEvent,
   NativeScrollEvent,
   Platform,
   Animated,
 } from "react-native";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { Movie } from "@/types/movie";
 import { theme } from "@/utils/theme";
+import useMovieStore from "@/store/movieStore";
 
 interface MovieCarouselProps {
   movies: Movie[];
@@ -29,7 +29,6 @@ const CARD_MARGIN = 40;
 
 const MovieCarousel: React.FC<MovieCarouselProps> = ({
   movies,
-  onMoviePress,
   showDots = true,
   autoPlay = false,
 }) => {
@@ -105,12 +104,6 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
     setActiveIndex(Math.max(0, Math.min(index, movies.length - 1)));
   };
 
-  const handleMoviePress = (movie: Movie) => {
-    if (onMoviePress) {
-      onMoviePress(movie);
-    } else {
-    }
-  };
 
   /**
    * Generates the animated style for a given card index
@@ -163,12 +156,16 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
    * and animated tilt/scale/depth effects.
    */
   const renderMovieCard = (movie: Movie, index: number) => {
+    const {movie: activeMovie, setMovie} = useMovieStore();
     return (
-      <TouchableOpacity
+      <Link
+      onPress={() => setMovie(movie)}
         key={movie.id}
         style={styles.cardContainer}
-        activeOpacity={0.8}
-        onPress={() => handleMoviePress(movie)}
+        href={{
+          pathname: "/movies/[id]",
+          params: { id: movie.id},
+        }}
       >
         <Animated.View style={getCardStyle(index)}>
           <Image source={{ uri: movie.image }} style={styles.cardImage} />
@@ -179,7 +176,7 @@ const MovieCarousel: React.FC<MovieCarouselProps> = ({
             <Text style={styles.movieCategory}>{movie.category}</Text>
           </View>
         </Animated.View>
-      </TouchableOpacity>
+      </Link>
     );
   };
 
@@ -232,6 +229,7 @@ const styles = StyleSheet.create({
     marginRight: CARD_MARGIN,
   },
   card: {
+    width: CARD_WIDTH,
     borderRadius: 15,
     overflow: "hidden",
   },

@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, ScrollView, StyleSheet } from "react-native";
 
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
@@ -12,27 +12,31 @@ import Subheader from "@/components/ui/Subheader";
 import MovieCarousel from "@/components/MovieCarousel";
 import { Movie } from "@/types/movie";
 import { useMovies } from "@/hooks/useMovies";
-
+import ComingSoon from "@/components/ComingSoon";
 
 export default function HomeScreen() {
   const { movies, loading, error } = useMovies();
   return (
-    <SafeAreaView style={styles.container}>
-      <ThemedView style={styles.pagePadded}>
-        <Greeting />
-        <SearchBar />
-        <Subheader subheading="Upcoming Movies" redirect="See all" />
-      </ThemedView>
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <ScrollView >
+        <ThemedView style={styles.pagePadded}>
+          <Greeting />
+          <SearchBar />
+          <Subheader subheading="Upcoming Movies" redirect="See all" />
+        </ThemedView>
 
-      {loading && <ThemedText>Loading movies...</ThemedText>}
-      {error && <ThemedText>Failed to load movies</ThemedText>}
+        {loading && <ThemedText>Loading movies...</ThemedText>}
+        {error && <ThemedText>Failed to load movies</ThemedText>}
 
-      {/* Carousel */}
-      {/* only show the carousel if there are movies */}
-      {movies.length > 0 && (
-        <MovieCarousel movies={movies} />
-      )}
-      
+        {/* Carousel */}
+        {/* only show the carousel if there are movies */}
+        {movies.length > 0 && <MovieCarousel movies={movies} />}
+
+        <ThemedView style={styles.pagePadded}>
+          <Subheader subheading="Coming Soon" redirect="See all" />
+          <ComingSoon />
+        </ThemedView>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -44,6 +48,8 @@ const styles = StyleSheet.create({
   },
   pagePadded: {
     paddingHorizontal: theme.padding.page,
+    paddingTop: theme.padding.page,
     backgroundColor: "transparent",
+    gap: theme.spacing.lg,
   },
 });

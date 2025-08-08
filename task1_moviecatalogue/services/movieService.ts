@@ -1,5 +1,8 @@
 import {
+  CastMember,
+  CrewMember,
   Movie,
+  MovieCredits,
   TMDBGenresResponse,
   TMDBMovie,
   TMDBMoviesResponse,
@@ -38,6 +41,46 @@ class MovieService {
     }
   }
 
+  async getMovieCredits(movieId: number): Promise<MovieCredits> {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/movie/${movieId}/credits?language=en-US`,
+        options
+      );
+      const data = await response.json();
+
+      // Map the cast members
+      const cast = data.cast.map((member: CastMember) => ({
+        ...member,
+        profile_path: member.profile_path
+          ? `${IMAGE_BASE_URL}${member.profile_path}`
+          : null,
+      }));
+
+      // Map the crew members
+      const crew = data.crew.map((member: CrewMember) => ({
+        ...member,
+        profile_path: member.profile_path
+          ? `${IMAGE_BASE_URL}${member.profile_path}`
+          : null,
+      }));
+
+      // Return the complete MovieCredits object
+      return {
+        id: movieId,
+        cast,
+        crew,
+      };
+    } catch (error) {
+      console.error(`Failed to fetch credits for movie ${movieId}:`, error);
+      return {
+        id: movieId,
+        cast: [],
+        crew: [],
+      };
+    }
+  }
+
   async getPopularMovies() {
     try {
       //fetch genres first, so that we can map genre_ids to their names
@@ -65,11 +108,44 @@ class MovieService {
           title: movie.title,
           category: genreNames.join(", "),
           image: `${IMAGE_BASE_URL}${movie.poster_path}`,
+          overview: movie.overview || "No overview available",
+          genre_ids: movie.genre_ids,
         };
       });
       return movies;
     } catch (error) {
       console.error("Failed to fetch movies:", error);
+      return [];
+    }
+  }
+
+  async getUpcomingMovies() {
+    try {
+      // Fetch genres to map genre_ids to names
+      await this.fetchGenres();
+      const response = await fetch(
+        `${BASE_URL}/movie/upcoming?language=en-US&page=1`,
+        options
+      );
+      const data: TMDBMoviesResponse = await response.json();
+      const movies: Movie[] = data.results.map((movie) => {
+        // Map genre_ids to genre names
+        const genreNames = movie.genre_ids
+          .map((id) => this.genreMap.get(id))
+          .filter((name) => name !== undefined);
+
+        return {
+          id: movie.id,
+          title: movie.title,
+          category: genreNames.join(", "),
+          image: `${IMAGE_BASE_URL}${movie.poster_path}`,
+          overview: movie.overview || "No overview available",
+          genre_ids: movie.genre_ids,
+        };
+      });
+      return movies;
+    } catch (error) {
+      console.error("Failed to fetch upcoming movies:", error);
       return [];
     }
   }

@@ -24,7 +24,6 @@ const styles = StyleSheet.create({
         borderRadius: theme.radius.sm,
         paddingHorizontal: theme.padding.md,
         gap: theme.spacing.sm,
-        marginVertical: theme.spacing.md
     }
 })
 

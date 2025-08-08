@@ -34,7 +34,7 @@ export default function TabLayout() {
 
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="movies"
         options={{
           title: 'Movies',
@@ -56,7 +56,7 @@ export default function TabLayout() {
           title: 'Profile',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
-      />
+      /> */}
     </Tabs>
   );
 }

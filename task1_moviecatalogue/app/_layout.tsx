@@ -30,6 +30,7 @@ export default function RootLayout() {
           {/* Tabs are nested inside of the root stack navigator */}
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
+          <Stack.Screen name="movies/[id]" options={{ headerShown: false }} />
         </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
