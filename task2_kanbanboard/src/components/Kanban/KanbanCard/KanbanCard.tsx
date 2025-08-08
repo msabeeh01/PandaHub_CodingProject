@@ -1,5 +1,5 @@
 import AvatarGroup from "@/components/AvatarGroup/AvatarGroup";
-import { Task } from "@/lib/types";
+import { Task } from "@/types/kanban.types";
 import { Draggable } from "@hello-pangea/dnd";
 import { MdMore, MdMoreHoriz } from "react-icons/md";
 

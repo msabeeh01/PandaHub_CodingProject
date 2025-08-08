@@ -2,7 +2,7 @@
 import React from 'react';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { KanbanData, Task, Column } from '@/lib/types';
+import { KanbanData, Task, Column } from '@/types/kanban.types';
 import { reorder, generateId } from '@/lib/utils';
 import KanbanColumn from './KanbanColumn';
 

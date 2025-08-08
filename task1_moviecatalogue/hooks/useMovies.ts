@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { movieService } from '../services/movieService';
-import { Movie } from '../types/movie';
+import { movieService } from '@/services/movie/movieService';
+import { Movie } from '@/types/domain';
 
 export const useMovies = () => {
   const [movies, setMovies] = useState<Movie[]>([]);

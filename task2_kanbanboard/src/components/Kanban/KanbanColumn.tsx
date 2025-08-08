@@ -1,4 +1,4 @@
-import { Column, Task } from "@/lib/types";
+import { Column, Task } from "@/types/kanban.types";
 import { Droppable } from "@hello-pangea/dnd";
 import React, { useState } from "react";
 import KanbanCard from "./KanbanCard/KanbanCard";
