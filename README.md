@@ -107,8 +107,8 @@ npm run dev
 ```
 
 ### Usage
-Open [http://localhost:3000/api/pokemon/list?limit=50&offset=100] for pagination example
-Open [http://localhost:3000/api/pokemon/3] for individual pokemon example
+- Open [http://localhost:3000/api/pokemon/list?limit=50&offset=100](http://localhost:3000/api/pokemon/list?limit=50&offset=100) for pagination example
+- Open [http://localhost:3000/api/pokemon/3](http://localhost:3000/api/pokemon/3) for individual pokemon example
 
 ### Features
 - ✅ Clean API service architecture
